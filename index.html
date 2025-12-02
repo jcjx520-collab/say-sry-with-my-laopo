@@ -15,6 +15,7 @@
             margin: 0;
             color: #333;
             overflow-x: hidden; /* 防止横向滚动 */
+            overflow-y: auto; /* 允许垂直滚动 */
             position: relative;
             padding: 10px; /* 手机边距 */
         }
@@ -137,7 +138,7 @@
         }
         .prompt {
             margin-top: 15px;
-            font-size: 18px; /* 手机字体适配 */
+            font-size: 16px; /* 缩小一点 */
             color: #ff69b4;
             font-weight: bold;
             animation: fadeIn 1s ease-in;
@@ -159,7 +160,8 @@
             box-shadow: 0 6px 12px rgba(255, 105, 180, 0.2);
             text-align: left;
             margin-top: 20px;
-            overflow: hidden;
+            overflow-y: auto; /* 允许垂直滚动 */
+            max-height: 80vh; /* 限制最大高度，超出滚动 */
             animation: unroll 1.5s ease-out forwards;
             transform: translateY(-100%);
             height: 0;
@@ -180,7 +182,7 @@
         .letter h1 {
             text-align: center;
             color: #ff69b4;
-            font-size: 24px; /* 手机标题小点 */
+            font-size: 22px; /* 缩小一点 */
             margin-bottom: 15px;
             animation: fadeInUp 1s ease-in forwards;
             opacity: 0;
@@ -189,7 +191,7 @@
         .letter p {
             line-height: 1.6; /* 手机阅读友好 */
             margin-bottom: 20px;
-            font-size: 16px; /* 标准手机字体 */
+            font-size: 15px; /* 缩小一点 */
             animation: fadeInUp 1s ease-in forwards;
             opacity: 0;
             transform: translateY(20px);
@@ -207,20 +209,20 @@
             font-style: italic;
             margin-top: 40px;
             color: #ff69b4;
-            font-size: 14px; /* 手机小字 */
+            font-size: 13px; /* 缩小一点 */
             animation: fadeIn 1.5s ease-in;
         }
         .lesson {
             text-align: right;
             color: #dc3545;
-            font-size: 12px; /* 更小 */
+            font-size: 11px; /* 缩小一点 */
             font-style: italic;
             margin-top: 8px;
             animation: fadeIn 1.8s ease-in;
         }
         .ending {
             text-align: center;
-            font-size: 22px; /* 手机适配 */
+            font-size: 20px; /* 缩小一点 */
             color: #ff1493;
             margin-top: 30px;
             font-weight: bold;
@@ -253,12 +255,13 @@
             .letter {
                 padding: 20px 15px;
                 margin-top: 15px;
+                max-height: 75vh; /* 小屏进一步限制 */
             }
             .letter p {
-                font-size: 15px;
+                font-size: 14px; /* 小屏再小一点 */
             }
             .prompt {
-                font-size: 16px;
+                font-size: 15px;
                 padding: 0 10px;
             }
             /* 减少背景心形数量 */
