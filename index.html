@@ -254,6 +254,71 @@
             }
         }
         
+        /* 音乐播放器样式 */
+        .music-player {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(255, 182, 193, 0.9);
+            border-radius: 50px;
+            padding: 10px 15px;
+            box-shadow: 0 4px 12px rgba(255, 105, 180, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            backdrop-filter: blur(5px);
+            border: 2px solid #ff69b4;
+        }
+        
+        .music-control {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #ff1493;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .music-control:hover {
+            background: rgba(255, 20, 147, 0.2);
+            transform: scale(1.1);
+        }
+        
+        .music-title {
+            color: #ff1493;
+            font-size: 14px;
+            font-weight: bold;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .volume-control {
+            width: 80px;
+            -webkit-appearance: none;
+            height: 4px;
+            border-radius: 2px;
+            background: #ffb6c1;
+            outline: none;
+        }
+        
+        .volume-control::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #ff1493;
+            cursor: pointer;
+        }
+        
         /* 手机端响应式调整 */
         @media (max-width: 768px) {
             .envelope {
@@ -287,6 +352,22 @@
             .ending {
                 font-size: 20px;
                 padding: 12px;
+            }
+            
+            /* 音乐播放器响应式 */
+            .music-player {
+                bottom: 10px;
+                right: 10px;
+                padding: 8px 12px;
+            }
+            
+            .music-title {
+                max-width: 100px;
+                font-size: 12px;
+            }
+            
+            .volume-control {
+                width: 60px;
             }
         }
         
@@ -331,10 +412,35 @@
                 font-size: 18px;
                 padding: 10px;
             }
+            
+            .music-player {
+                bottom: 8px;
+                right: 8px;
+                padding: 6px 10px;
+            }
+            
+            .music-control {
+                width: 35px;
+                height: 35px;
+                font-size: 20px;
+            }
+            
+            .music-title {
+                max-width: 80px;
+                font-size: 11px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- 音乐播放器 -->
+    <div class="music-player" id="musicPlayer">
+        <button class="music-control" id="playBtn">🎵</button>
+        <span class="music-title" id="musicTitle">老婆 - 背景音乐</span>
+        <input type="range" class="volume-control" id="volumeControl" min="0" max="1" step="0.1" value="0.5">
+    </div>
+    
+    <!-- 原有内容 -->
     <div class="hearts-bg" id="heartsBg"></div>
     <div class="hearts-rain" id="heartsRain"></div>
     <div class="container">
@@ -360,7 +466,86 @@
         </div>
     </div>
 
+    <!-- 音频元素 -->
+    <audio id="backgroundMusic" loop>
+        <source src="laopo.mp3" type="audio/mpeg">
+        <!-- 备用音源（如果需要的话） -->
+        <!-- <source src="laopo.ogg" type="audio/ogg"> -->
+    </audio>
+
     <script>
+        // 音乐播放控制
+        const backgroundMusic = document.getElementById('backgroundMusic');
+        const playBtn = document.getElementById('playBtn');
+        const volumeControl = document.getElementById('volumeControl');
+        const musicTitle = document.getElementById('musicTitle');
+        
+        // 初始化音乐设置
+        let isPlaying = false;
+        
+        // 设置音量
+        backgroundMusic.volume = volumeControl.value;
+        
+        // 音量控制
+        volumeControl.addEventListener('input', function() {
+            backgroundMusic.volume = this.value;
+        });
+        
+        // 播放/暂停控制
+        playBtn.addEventListener('click', function() {
+            if (isPlaying) {
+                backgroundMusic.pause();
+                playBtn.textContent = '🎵';
+                musicTitle.textContent = '已暂停';
+            } else {
+                // 先尝试播放，如果被浏览器阻止，则提示用户
+                const playPromise = backgroundMusic.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        // 播放成功
+                        isPlaying = true;
+                        playBtn.textContent = '⏸️';
+                        musicTitle.textContent = '老婆 - 播放中';
+                    }).catch(error => {
+                        // 播放被阻止，显示提示
+                        console.log('播放被阻止:', error);
+                        musicTitle.textContent = '点击播放按钮';
+                        alert('请点击播放按钮开始音乐');
+                    });
+                }
+            }
+        });
+        
+        // 监听音频状态变化
+        backgroundMusic.addEventListener('play', () => {
+            isPlaying = true;
+            playBtn.textContent = '⏸️';
+            musicTitle.textContent = '老婆 - 播放中';
+        });
+        
+        backgroundMusic.addEventListener('pause', () => {
+            isPlaying = false;
+            playBtn.textContent = '🎵';
+            musicTitle.textContent = '老婆 - 背景音乐';
+        });
+        
+        // 页面点击时自动播放（解决浏览器自动播放限制）
+        document.addEventListener('click', function initAudio() {
+            if (!isPlaying) {
+                backgroundMusic.play().then(() => {
+                    isPlaying = true;
+                    playBtn.textContent = '⏸️';
+                    musicTitle.textContent = '老婆 - 播放中';
+                }).catch(() => {
+                    // 如果自动播放失败，显示提示
+                    musicTitle.textContent = '点击播放按钮';
+                });
+            }
+            // 移除监听器，避免重复执行
+            document.removeEventListener('click', initAudio);
+        });
+        
         // 生成飘浮心形背景
         function createFloatingHearts() {
             const heartsBg = document.getElementById('heartsBg');
@@ -382,6 +567,18 @@
             document.getElementById('letter').style.display = 'block';
             // 触发心形雨
             createHeartRain();
+            
+            // 确保页面可以滚动
+            document.body.style.overflowY = 'auto';
+            
+            // 尝试自动播放音乐（如果还没播放）
+            if (!isPlaying) {
+                backgroundMusic.play().then(() => {
+                    isPlaying = true;
+                    playBtn.textContent = '⏸️';
+                    musicTitle.textContent = '老婆 - 播放中';
+                });
+            }
         }
 
         // 生成心形雨
@@ -401,9 +598,6 @@
                 }, i * 100);
             }
         }
-        
-        // 确保页面可以滚动
-        document.body.style.overflowY = 'auto';
     </script>
 </body>
 </html>
